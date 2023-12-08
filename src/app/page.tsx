@@ -36,7 +36,7 @@ export default function Home() {
     if (error) {
       console.log(error);
     } else {
-      setInsituteName(`มหาวิทยาลัยราชภัฏ${data.un}}`);
+      setInsituteName(`มหาวิทยาลัยราชภัฏ${data.un}`);
       setGraduateCount(+data.c);
       setGraduateCounted(+data.konrub);
       setGraduateRemaining(+data.counting);

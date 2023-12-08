@@ -1,28 +1,81 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+const fetchData = async () => {
+  try {
+    const res = await fetch("/api/data");
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return {};
+  }
+};
 
 export default function Home() {
-  const insituteName = "มหาวิทยาลัยราชภัฏเชียงใหม่";
-  const graduateCount = 1000;
-  const graduateCounted = 100;
-  const graduateRemaining = graduateCount - graduateCounted;
-
-  const timeUsed = 100;
-  const timeRemaining = 100;
-  const timeEstimate = 100;
-
-  const [nowTime, setNowTime] = useState(
-    new Date().toLocaleTimeString("th-TH", { timeZone: "Asia/Bangkok" })
+  const [insituteName, setInsituteName] = useState(
+    "มหาวิทยาลัยราชภัฏเชียงใหม่"
   );
+  const [graduateCount, setGraduateCount] = useState(0);
+  const [graduateCounted, setGraduateCounted] = useState(0);
+  const [graduateRemaining, setGraduateRemaining] = useState(0);
+  const [timeUsed, setTimeUsed] = useState("00:00:00");
+  const [nowTime, setNowTime] = useState(
+    new Date().toLocaleTimeString("th-TH", {
+      hour12: false,
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    })
+  );
+  const [lastFetchTime, setLastFetchTime] = useState(0);
 
-  const tick = () => {
-    setNowTime(
-      new Date().toLocaleTimeString("th-TH", { timeZone: "Asia/Bangkok" })
-    );
+  const fetchDataAndUpdateState = async () => {
+    try {
+      const startTime = Date.now();
+      const data = await fetchData();
+      const endTime = Date.now();
+      const fetchDuration = endTime - startTime;
+
+      if (fetchDuration < 1000) {
+        // If the fetch duration is less than 1 second, delay the next fetch
+        setTimeout(fetchDataAndUpdateState, 1000 - fetchDuration);
+      } else {
+        // If the fetch duration is longer than 1 second, fetch immediately
+        fetchDataAndUpdateState();
+      }
+
+      setInsituteName(`มหาวิทยาลัยราชภัฏ${data.un}`);
+      setGraduateCount(+data.c);
+      setGraduateCounted(+data.konrub);
+      setGraduateRemaining(+data.counting);
+      setTimeUsed(data.timeuse);
+      setLastFetchTime(endTime);
+    } catch (error) {
+      console.error("Error updating state:", error);
+    }
   };
 
-  setInterval(tick, 1000);
+  useEffect(() => {
+    fetchDataAndUpdateState();
+  }, []);
+
+  useEffect(() => {
+    const tickInterval = setInterval(() => {
+      setNowTime(
+        new Date().toLocaleTimeString("th-TH", {
+          hour12: false,
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        })
+      );
+    }, 1000);
+
+    return () => {
+      clearInterval(tickInterval);
+    };
+  }, []);
 
   return (
     <main>
@@ -92,7 +145,7 @@ export default function Home() {
                 ต้องใช้เวลาอีก
               </div>
               <div className="text-2xl font-bold text-gray-800 text-center">
-                {timeRemaining}
+                {}
               </div>
             </div>
             <div className="flex flex-row items-center justify-center gap-3  w-full h-full px-2 py-3">
@@ -100,7 +153,7 @@ export default function Home() {
                 คาดการณ์เวลาสิ้นสุด
               </div>
               <div className="text-2xl font-bold text-gray-800 text-center">
-                {timeEstimate}
+                {}
               </div>
             </div>
           </div>

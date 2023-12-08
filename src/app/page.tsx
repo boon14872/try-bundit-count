@@ -1,16 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-const fetchData = async () => {
-  try {
-    const res = await fetch("/api/data");
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return {};
-  }
-};
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function Home() {
   const [insituteName, setInsituteName] = useState(
@@ -20,6 +11,10 @@ export default function Home() {
   const [graduateCounted, setGraduateCounted] = useState(0);
   const [graduateRemaining, setGraduateRemaining] = useState(0);
   const [timeUsed, setTimeUsed] = useState("00:00:00");
+
+  const [estimatedTime, setEstimatedTime] = useState("00:00:00");
+  const [usedTime, setUsedTime] = useState("00:00:00");
+
   const [nowTime, setNowTime] = useState(
     new Date().toLocaleTimeString("th-TH", {
       hour12: false,
@@ -28,53 +23,90 @@ export default function Home() {
       second: "numeric",
     })
   );
-  const [lastFetchTime, setLastFetchTime] = useState(0);
 
-  const fetchDataAndUpdateState = async () => {
-    try {
-      const startTime = Date.now();
-      const data = await fetchData();
-      const endTime = Date.now();
-      const fetchDuration = endTime - startTime;
+  let dataForCalculate: any[] = [];
 
-      if (fetchDuration < 1000) {
-        // If the fetch duration is less than 1 second, delay the next fetch
-        setTimeout(fetchDataAndUpdateState, 1000 - fetchDuration);
-      } else {
-        // If the fetch duration is longer than 1 second, fetch immediately
-        fetchDataAndUpdateState();
-      }
+  const supabase = createClientComponentClient();
 
-      setInsituteName(`มหาวิทยาลัยราชภัฏ${data.un}`);
+  const fetchGraduateCount = async () => {
+    const { data, error } = await supabase
+      .from("bunditcmru")
+      .select("*")
+      .single();
+    if (error) {
+      console.log(error);
+    } else {
+      setInsituteName(`มหาวิทยาลัยราชภัฏ${data.un}}`);
       setGraduateCount(+data.c);
       setGraduateCounted(+data.konrub);
       setGraduateRemaining(+data.counting);
       setTimeUsed(data.timeuse);
-      setLastFetchTime(endTime);
-    } catch (error) {
-      console.error("Error updating state:", error);
+
+      const timeUsedSplit = data.timeuse.split(":");
+      const timeUsedHour = +timeUsedSplit[0];
+      const timeUsedMinute = +timeUsedSplit[1];
+      const timeUsedSecond = +timeUsedSplit[2];
+      const timeUsedInSecond =
+        timeUsedHour * 3600 + timeUsedMinute * 60 + timeUsedSecond;
+      const timeUsedInSecondPerPerson = timeUsedInSecond / data.konrub;
+      const timeUsedInSecondPerPersonEstimated =
+        timeUsedInSecondPerPerson * data.counting;
+      const timeUsedInSecondPerPersonEstimatedHour = Math.floor(
+        timeUsedInSecondPerPersonEstimated / 3600
+      );
+      const timeUsedInSecondPerPersonEstimatedMinute = Math.floor(
+        (timeUsedInSecondPerPersonEstimated % 3600) / 60
+      );
+      const timeUsedInSecondPerPersonEstimatedSecond = Math.floor(
+        (timeUsedInSecondPerPersonEstimated % 3600) % 60
+      );
+      setTimeUsed(
+        `${timeUsedInSecondPerPersonEstimatedHour
+          .toString()
+          .padStart(2, "0")}:${timeUsedInSecondPerPersonEstimatedMinute
+          .toString()
+          .padStart(2, "0")}:${timeUsedInSecondPerPersonEstimatedSecond
+          .toString()
+          .padStart(2, "0")}`
+      );
+
+      const nowTimeSplit = nowTime.split(":");
+      const nowTimeHour = +nowTimeSplit[0];
+      const nowTimeMinute = +nowTimeSplit[1];
+      const nowTimeSecond = +nowTimeSplit[2];
+      const nowTimeInSecond =
+        nowTimeHour * 3600 + nowTimeMinute * 60 + nowTimeSecond;
+
+      const endTime = nowTimeInSecond + timeUsedInSecondPerPersonEstimated;
+      const endTimeHour = Math.floor(endTime / 3600);
+      const endTimeMinute = Math.floor((endTime % 3600) / 60);
+      const endTimeSecond = Math.floor((endTime % 3600) % 60);
+
+      setEstimatedTime(
+        `${endTimeHour.toString().padStart(2, "0")}:${endTimeMinute
+          .toString()
+          .padStart(2, "0")}:${endTimeSecond.toString().padStart(2, "0")}`
+      );
     }
   };
 
+  const tick = () => {
+    setNowTime(
+      new Date().toLocaleTimeString("th-TH", {
+        hour12: false,
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      })
+    );
+  };
+  // set interval for update time every 1 second and fetch data every 1 second
   useEffect(() => {
-    fetchDataAndUpdateState();
-  }, []);
-
-  useEffect(() => {
-    const tickInterval = setInterval(() => {
-      setNowTime(
-        new Date().toLocaleTimeString("th-TH", {
-          hour12: false,
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-        })
-      );
+    const timer = setInterval(() => {
+      tick();
+      fetchGraduateCount();
     }, 1000);
-
-    return () => {
-      clearInterval(tickInterval);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -145,7 +177,7 @@ export default function Home() {
                 ต้องใช้เวลาอีก
               </div>
               <div className="text-2xl font-bold text-gray-800 text-center">
-                {}
+                {usedTime}
               </div>
             </div>
             <div className="flex flex-row items-center justify-center gap-3  w-full h-full px-2 py-3">
@@ -153,7 +185,7 @@ export default function Home() {
                 คาดการณ์เวลาสิ้นสุด
               </div>
               <div className="text-2xl font-bold text-gray-800 text-center">
-                {}
+                {estimatedTime}
               </div>
             </div>
           </div>

@@ -121,7 +121,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-800">
+            <div className="text-2xl font-bold text-gray-800 pr-4">
               จำนวนบัณฑิตทั้งหมด {graduateCount} คน
             </div>
           </div>

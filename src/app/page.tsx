@@ -11,9 +11,9 @@ export default function Home() {
   const [graduateCounted, setGraduateCounted] = useState(0);
   const [graduateRemaining, setGraduateRemaining] = useState(0);
   const [timeUsed, setTimeUsed] = useState("00:00:00");
+  const [usedTime, setUsedTime] = useState("00:00:00");
 
   const [estimatedTime, setEstimatedTime] = useState("00:00:00");
-  const [usedTime, setUsedTime] = useState("00:00:00");
 
   const [nowTime, setNowTime] = useState(
     new Date().toLocaleTimeString("th-TH", {
@@ -24,7 +24,6 @@ export default function Home() {
     })
   );
 
-  let dataForCalculate: any[] = [];
 
   const supabase = createClientComponentClient();
 
@@ -40,7 +39,7 @@ export default function Home() {
       setGraduateCount(+data.c);
       setGraduateCounted(+data.konrub);
       setGraduateRemaining(+data.counting);
-      setTimeUsed(data.timeuse);
+      setUsedTime(data.timeuse);
 
       const timeUsedSplit = data.timeuse.split(":");
       const timeUsedHour = +timeUsedSplit[0];
@@ -113,7 +112,7 @@ export default function Home() {
     <main>
       {/* navbar for Rajabhat University name like มหาวิทยาลัยราชภัฏเชียงใหม่ */}
       <div className="flex flex-col justify-center items-center min-h-screen bg-white">
-        <div className="flex flex-row w-full bg-yellow-300 h-fit gap-3 items-center p-2 justify-between border-b-2 border-gray-100 shadow-sm">
+        <div className="flex md:flex-row flex-col w-full bg-yellow-300 h-fit gap-3 items-center p-2 justify-between border-b-2 border-gray-100 shadow-sm">
           <div className="flex flex-row items-center gap-2">
             <Image src="/cmru.png" width={100} height={100} alt={""} />
             <div className="text-2xl font-bold text-gray-800">
@@ -128,7 +127,7 @@ export default function Home() {
         </div>
         {/* content */}
         <div className="w-5/6 justify-center mx-auto py-4 shadow-sm rounded-lg flex flex-col gap-4 h-full my-auto mt-auto">
-          <div className="flex flex-row w-full h-full gap-3">
+          <div className="flex md:flex-row flex-col w-full h-full gap-3">
             <div className="w-full h-full flex flex-col gap-6 items-center bg-green-400 p-4 pt-6 border border-gray-200 rounded-lg shadow-lg text-white">
               <div className="text-3xl font-bold text-gray-800 text-center">
                 จำนวนบัณฑิตที่รับไปแล้ว
@@ -159,7 +158,7 @@ export default function Home() {
                 เวลาที่ใช้ไปแล้ว
               </div>
               <div className="text-2xl font-bold text-gray-800 text-center">
-                {timeUsed}
+                {usedTime}
               </div>
             </div>
             <div className="flex flex-row items-center justify-center gap-3  w-full h-full px-2 py-3">
@@ -177,7 +176,7 @@ export default function Home() {
                 ต้องใช้เวลาอีก
               </div>
               <div className="text-2xl font-bold text-gray-800 text-center">
-                {usedTime}
+                {timeUsed}
               </div>
             </div>
             <div className="flex flex-row items-center justify-center gap-3  w-full h-full px-2 py-3">

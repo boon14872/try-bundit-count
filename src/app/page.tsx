@@ -24,7 +24,6 @@ export default function Home() {
     })
   );
 
-
   const supabase = createClientComponentClient();
 
   const fetchGraduateCount = async () => {
@@ -60,13 +59,23 @@ export default function Home() {
         (timeUsedInSecondPerPersonEstimated % 3600) % 60
       );
       setTimeUsed(
-        `${timeUsedInSecondPerPersonEstimatedHour
-          .toString()
-          .padStart(2, "0")}:${timeUsedInSecondPerPersonEstimatedMinute
-          .toString()
-          .padStart(2, "0")}:${timeUsedInSecondPerPersonEstimatedSecond
-          .toString()
-          .padStart(2, "0")}`
+        `${
+          Number.isNaN(timeUsedInSecondPerPersonEstimatedHour)
+            ? 0
+            : timeUsedInSecondPerPersonEstimatedHour.toString().padStart(2, "0")
+        }:${
+          Number.isNaN(timeUsedInSecondPerPersonEstimatedMinute)
+            ? 0
+            : timeUsedInSecondPerPersonEstimatedMinute
+                .toString()
+                .padStart(2, "0")
+        }:${
+          Number.isNaN(timeUsedInSecondPerPersonEstimatedSecond)
+            ? 0
+            : timeUsedInSecondPerPersonEstimatedSecond
+                .toString()
+                .padStart(2, "0")
+        }`
       );
 
       const nowTimeSplit = nowTime.split(":");
@@ -82,9 +91,19 @@ export default function Home() {
       const endTimeSecond = Math.floor((endTime % 3600) % 60);
 
       setEstimatedTime(
-        `${endTimeHour.toString().padStart(2, "0")}:${endTimeMinute
-          .toString()
-          .padStart(2, "0")}:${endTimeSecond.toString().padStart(2, "0")}`
+        `${
+          Number.isNaN(endTimeHour)
+            ? 0
+            : endTimeHour.toString().padStart(2, "0")
+        }:${
+          Number.isNaN(endTimeMinute)
+            ? 0
+            : endTimeMinute.toString().padStart(2, "0")
+        }:${
+          Number.isNaN(endTimeSecond)
+            ? 0
+            : endTimeSecond.toString().padStart(2, "0")
+        }`
       );
     }
   };

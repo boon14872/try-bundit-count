@@ -61,17 +61,17 @@ export default function Home() {
       setTimeUsed(
         `${
           Number.isNaN(timeUsedInSecondPerPersonEstimatedHour)
-            ? 0
+            ? "00"
             : timeUsedInSecondPerPersonEstimatedHour.toString().padStart(2, "0")
         }:${
           Number.isNaN(timeUsedInSecondPerPersonEstimatedMinute)
-            ? 0
+            ? "00"
             : timeUsedInSecondPerPersonEstimatedMinute
                 .toString()
                 .padStart(2, "0")
         }:${
           Number.isNaN(timeUsedInSecondPerPersonEstimatedSecond)
-            ? 0
+            ? "00"
             : timeUsedInSecondPerPersonEstimatedSecond
                 .toString()
                 .padStart(2, "0")
@@ -93,15 +93,15 @@ export default function Home() {
       setEstimatedTime(
         `${
           Number.isNaN(endTimeHour)
-            ? 0
+            ? "00"
             : endTimeHour.toString().padStart(2, "0")
         }:${
           Number.isNaN(endTimeMinute)
-            ? 0
+            ? "00"
             : endTimeMinute.toString().padStart(2, "0")
         }:${
           Number.isNaN(endTimeSecond)
-            ? 0
+            ? "00"
             : endTimeSecond.toString().padStart(2, "0")
         }`
       );

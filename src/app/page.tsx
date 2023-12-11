@@ -78,12 +78,14 @@ export default function Home() {
         }`
       );
 
-      const nowTimeSplit = new Date().toLocaleTimeString("th-TH", {
-      hour12: false,
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-    }).split(":");
+      const nowTimeSplit = new Date()
+        .toLocaleTimeString("th-TH", {
+          hour12: false,
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        })
+        .split(":");
       const nowTimeHour = +nowTimeSplit[0];
       const nowTimeMinute = +nowTimeSplit[1];
       const nowTimeSecond = +nowTimeSplit[2];
@@ -95,21 +97,23 @@ export default function Home() {
       const endTimeMinute = Math.floor((endTime % 3600) / 60);
       const endTimeSecond = Math.floor((endTime % 3600) % 60);
 
-      setEstimatedTime(
-        `${
-          Number.isNaN(endTimeHour)
-            ? "00"
-            : endTimeHour.toString().padStart(2, "0")
-        }:${
-          Number.isNaN(endTimeMinute)
-            ? "00"
-            : endTimeMinute.toString().padStart(2, "0")
-        }:${
-          Number.isNaN(endTimeSecond)
-            ? "00"
-            : endTimeSecond.toString().padStart(2, "0")
-        }`
-      );
+      if (timeUsed != "00:00:00") {
+        setEstimatedTime(
+          `${
+            Number.isNaN(endTimeHour)
+              ? "00"
+              : endTimeHour.toString().padStart(2, "0")
+          }:${
+            Number.isNaN(endTimeMinute)
+              ? "00"
+              : endTimeMinute.toString().padStart(2, "0")
+          }:${
+            Number.isNaN(endTimeSecond)
+              ? "00"
+              : endTimeSecond.toString().padStart(2, "0")
+          }`
+        );
+      }
     }
   };
 

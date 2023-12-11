@@ -78,7 +78,12 @@ export default function Home() {
         }`
       );
 
-      const nowTimeSplit = nowTime.split(":");
+      const nowTimeSplit = new Date().toLocaleTimeString("th-TH", {
+      hour12: false,
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    }).split(":");
       const nowTimeHour = +nowTimeSplit[0];
       const nowTimeMinute = +nowTimeSplit[1];
       const nowTimeSecond = +nowTimeSplit[2];

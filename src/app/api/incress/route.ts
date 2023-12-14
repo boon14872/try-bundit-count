@@ -1,8 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, res: NextResponse<any>) {
-  // get data from supabase
+export async function GET(req: NextRequest) {
+  console.log("GET");
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || "",
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
@@ -15,17 +16,15 @@ export async function GET(req: NextRequest, res: NextResponse<any>) {
     data: ApiData[] | null;
     error: any;
   } = await supabase.from("bunditcmru").select("*");
-
-  if (error) {
-    return NextResponse.json([], {
-      status: 200,
-    });
-  }
-
-  if (!data) {
-    return NextResponse.json([], {
-      status: 200,
-    });
+  if (!data || error) {
+    return NextResponse.json(
+      {
+        error: error,
+      },
+      {
+        status: 400,
+      }
+    );
   }
 
   const updateValue = {
@@ -38,18 +37,27 @@ export async function GET(req: NextRequest, res: NextResponse<any>) {
     .update({ konrub: data[0].konrub + 1 })
     .eq("id", data[0].id);
 
-  if (updateError) {
-    return NextResponse.json(updateError, {
-      status: 500,
-    });
+  if (updateError || !updateData) {
+    return NextResponse.json(
+      {
+        error: updateError,
+      },
+      {
+        status: 400,
+      }
+    );
   }
-  if (!updateData) {
-    return NextResponse.json([], {
+  const res = NextResponse.json(
+    {
+      result: updateData,
+      status: "success",
+    },
+    {
       status: 200,
-    });
-  }
-
-  return NextResponse.json(updateData, {
-    status: 200,
-  });
+    }
+  );
+  res.headers.set("Access-Control-Allow-Origin", "*");
+  // no cache
+  res.headers.set("Cache-Control", "no-store, max-age=0");
+  return res;
 }

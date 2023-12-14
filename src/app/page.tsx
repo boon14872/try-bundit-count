@@ -97,7 +97,7 @@ export default function Home() {
       const endTimeMinute = Math.floor((endTime % 3600) / 60);
       const endTimeSecond = Math.floor((endTime % 3600) % 60);
 
-      if (timeUsed != "00:00:00") {
+      if (timeUsed != "00:00:00" || !isNaN(timeUsedInSecondPerPersonEstimatedSecond)) {
         setEstimatedTime(
           `${
             Number.isNaN(endTimeHour)

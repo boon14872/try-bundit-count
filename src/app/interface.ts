@@ -8,9 +8,9 @@
 
 interface ApiData {
   id: string;
-  c: string;
-  counting: string;
-  konrub: string;
+  c: number;
+  counting: number;
+  konrub: number;
   timeuse: string;
   un: string;
 }

@@ -1,8 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextResponse<any>) {
   // get data from supabase
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -18,8 +17,8 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
   } = await supabase.from("bunditcmru").select("*");
 
   if (error) {
-    return NextResponse.json(error, {
-      status: 500,
+    return NextResponse.json([], {
+      status: 200,
     });
   }
 
@@ -32,7 +31,7 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
   const updateValue = {
     konrub: data[0].konrub + 1,
     timeuse: data[0].timeuse,
-  }
+  };
 
   const { updateData, updateError }: any = await supabase
     .from("bunditcmru")

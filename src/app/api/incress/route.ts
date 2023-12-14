@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     .update({ konrub: data[0].konrub + 1 })
     .eq("id", data[0].id);
 
-  if (updateError || !updateData) {
+  if (updateError) {
     return NextResponse.json(
       {
         error: updateError,
